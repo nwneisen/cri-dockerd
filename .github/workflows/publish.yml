@@ -17,6 +17,13 @@ jobs:
             goos: windows
 
     steps:
+      - name: Get Release Info
+        run: |
+          {
+            RELEASE_TAG=${GITHUB_REF/refs\/tags\//}
+            echo RELEASE_TAG=${RELEASE_TAG:1}
+            echo "REPOSITORY_NAME=${GITHUB_REPOSITORY#*/}"
+          } >> "$GITHUB_ENV"
       - uses: actions/checkout@v2
       - uses: wangyoucao577/go-release-action@v1.38
         with:
@@ -24,7 +31,8 @@ jobs:
           goos: ${{ matrix.goos }}
           goarch: ${{ matrix.goarch }}
           project_path: "./"
-          binary_name: "cri-dockerd"
+          binary_name: ${{env.REPOSITORY_NAME}}
           pre_command: "export CGO_ENABLED=0"
           extra_files: LICENSE README.md
           overwrite: true
+          asset_name: ${{env.REPOSITORY_NAME}}-${{ env.RELEASE_TAG }}-${{matrix.goos}}-${{matrix.goarch}}
