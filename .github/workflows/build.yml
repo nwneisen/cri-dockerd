@@ -14,8 +14,8 @@ jobs:
       - name: Build the binaries
         uses: addnab/docker-run-action@v3
         with:
-          image: golang:1.20.5-alpine3.17
+          image: ubuntu:latest
           options: -v ${{ github.workspace }}:/code -w /code
           run: |
-            apk add --no-cache make
+            apt-get update && apt-get install make
             make deb
