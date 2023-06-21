@@ -1,0 +1,19 @@
+name: Build artifacts
+
+on:
+  pull_request:
+    types: [opened, edited, reopened, synchronize]
+
+jobs:
+  build:
+    name: Build linux binaries
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Build the binaries
+        uses: addnab/docker-run-action@v3
+        with:
+          image: ubuntu:latest
+          run: |
+            make deb
