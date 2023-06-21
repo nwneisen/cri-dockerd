@@ -15,6 +15,7 @@ jobs:
         uses: addnab/docker-run-action@v3
         with:
           image: golang:1.20.5-alpine3.17
+          options: -v ${{ github.workspace }}:/code -w /code
           run: |
             apk add --no-cache make
             make deb
