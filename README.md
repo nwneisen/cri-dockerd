@@ -117,3 +117,33 @@ by running:
 make dev
 ```
 
+#### Integration Tests
+
+The integration tests work by using the dev setup and copying in some additional tools used
+to run the tests. The current setup will grab the latest official release of these tools.
+When running in CI, it will grab the latest version from the project's master branch.
+
+The first tool is ginkgo. It can be installed using the project's
+[installation instructions](https://onsi.github.io/ginkgo/#getting-started) or using the following
+commands:
+
+```bash
+go install github.com/onsi/ginkgo/v2/ginkgo@latest
+```
+
+The next tool is cri-tools. This is a suite of tools that will run tests against cri-dockerd in order
+to test compatibility with the kubernetes CRI. This can be installed using the following:
+
+```bash
+curl -s https://api.github.com/repos/kubernetes-sigs/cri-tools/releases/latest | grep "critest-.*-linux-amd64.tar.gz" | cut -d : -f 2,3 | tr -d \" | wget -qi -
+tar -zxvf critest-*-linux-amd64.tar.gz critest
+cp critest /usr/local/bin/
+rm critest*
+```
+
+The integration script will find these tools on your local system and copy them into the minikube
+VM. It will then run a command to start running the tests.
+
+```bash
+make integration
+```

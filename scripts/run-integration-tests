@@ -1,0 +1,25 @@
+#!/bin/bash
+
+# Install go
+minikube cp scripts/install-go /usr/local/bin/install-go
+minikube ssh -- 'sudo chmod +x /usr/local/bin/install-go'
+minikube ssh -- 'sudo /usr/local/bin/install-go'
+
+# Install docker
+minikube cp scripts/install-docker /usr/local/bin/install-docker
+minikube ssh -- 'sudo chmod +x /usr/local/bin/install-docker'
+minikube ssh -- 'sudo /usr/local/bin/install-docker'
+
+# Install Ginko
+minikube ssh -- '/usr/local/go/bin/go install github.com/onsi/ginkgo/v2/ginkgo@latest'
+
+# Install cri-tools
+minikube cp $(whereis critest | cut -d ' ' -f 2) /usr/local/bin/critest
+minikube ssh -- 'sudo chmod +x /usr/local/bin/critest'
+
+## Run the tests
+minikube ssh -- 'sudo sysctl net.ipv6.conf.all.disable_ipv6=0'
+minikube ssh -- 'export LANG=C'
+minikube ssh -- 'export LC_ALL=C'
+minikube ssh -- 'docker run --rm -v /usr/local/bin:/target jpetazzo/nsenter'
+minikube ssh -- 'sudo /usr/local/bin/critest -runtime-endpoint=unix:///var/run/cri-dockerd.sock -ginkgo.skip="runtime should support apparmor|runtime should support reopening container log|runtime should support execSync with timeout|runtime should support selinux|.*should support propagation.*"'

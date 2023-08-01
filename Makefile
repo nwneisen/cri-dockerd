@@ -94,6 +94,11 @@ release: static-linux deb rpm cross-arm cross-mac cross-win ## build the release
 	# linux
 	cp $(PACKAGING_DIR)/static/build/linux/cri-dockerd-$(VERSION).tgz $(RELEASE_DIR)/cri-dockerd-$(VERSION).amd64.tgz
 
+
 .PHONY: dev
 dev: cri-dockerd ## Run cri-docker in a running minikube
 	./scripts/replace-in-minikube
+
+.PHONY: integration
+integration: dev
+	./scripts/run-integration-tests
