@@ -5,8 +5,8 @@ on:
     branches: [ "master" ]
   pull_request:
     branches: [ "master" ]
-  release:
-    types: [prereleased]
+  workflow_call:
+
 
 jobs:
   build-linux:
@@ -23,7 +23,7 @@ jobs:
       run: make static-linux
 
   build-deb:
-    if: ${{ github.event_name == 'release' }}
+    if: ${{ github.event_name == 'workflow_call' }}
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
@@ -37,7 +37,7 @@ jobs:
       run: make deb
 
   build-rpm:
-    if: ${{ github.event_name == 'release' }}
+    if: ${{ github.event_name == 'workflow_call' }}
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
@@ -51,7 +51,7 @@ jobs:
       run: make rpm
 
   build-arm:
-    if: ${{ github.event_name == 'release' }}
+    if: ${{ github.event_name == 'workflow_call' }}
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
@@ -91,7 +91,7 @@ jobs:
       run: make cross-mac
 
   upload:
-    if: ${{ github.event_name == 'release' }}
+    if: ${{ github.event_name == 'workflow_call' }}
     runs-on: ubuntu-latest
     needs: [build-linux, build-deb, build-rpm, build-windows, build-mac, build-arm]
     steps:
