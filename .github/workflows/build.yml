@@ -22,33 +22,33 @@ jobs:
     - name: Build
       run: make static-linux
 
-  build-deb:
-    if: ${{ github.event_name == 'release' }}
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v3
+  # build-deb:
+  #   if: ${{ github.event_name == 'release' }}
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #   - uses: actions/checkout@v3
 
-    - name: Set up Go
-      uses: actions/setup-go@v4
-      with:
-        go-version: '1.20'
+  #   - name: Set up Go
+  #     uses: actions/setup-go@v4
+  #     with:
+  #       go-version: '1.20'
 
-    - name: Build
-      run: make deb
+  #   - name: Build
+  #     run: make deb
 
-  build-rpm:
-    if: ${{ github.event_name == 'release' }}
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v3
+  # build-rpm:
+  #   if: ${{ github.event_name == 'release' }}
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #   - uses: actions/checkout@v3
 
-    - name: Set up Go
-      uses: actions/setup-go@v4
-      with:
-        go-version: '1.20'
+  #   - name: Set up Go
+  #     uses: actions/setup-go@v4
+  #     with:
+  #       go-version: '1.20'
 
-    - name: Build
-      run: make rpm
+  #   - name: Build
+  #     run: make rpm
 
   build-arm:
     if: ${{ github.event_name == 'release' }}
