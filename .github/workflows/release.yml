@@ -13,6 +13,7 @@ jobs:
     uses: ./.github/workflows/integration.yml
   publish:
     needs: [build, e2e, integration]
+    if: ${{ always() && contains(join(needs.*.result, ','), 'success') }}
     uses: ./.github/workflows/publish.yml
   docs:
     needs: [build, e2e, integration]
