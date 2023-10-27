@@ -5,8 +5,15 @@ on:
     types: [prereleased]
 
 jobs:
-  start-release:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Build Debian
-        run: echo hello
+  build:
+    uses: ./.github/workflows/build.yml
+  e2e:
+    uses: ./.github/workflows/e2e.yml
+  integration:
+    uses: ./.github/workflows/integration.yml
+  publish:
+    needs: [build, e2e, integration]
+    uses: ./.github/workflows/publish.yml
+  docs:
+    needs: [build, e2e, integration]
+    uses: ./.github/workflows/docs.yml
