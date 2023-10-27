@@ -1,10 +1,12 @@
-name: CI
+name: Build
 
 on:
   push:
     branches: [ "master" ]
   pull_request:
     branches: [ "master" ]
+  release:
+    types: [prereleased]
 
 jobs:
 
@@ -72,3 +74,18 @@ jobs:
 
     - name: Build
       run: make cross-arm
+
+  upload:
+    if: ${{ github.event_name == 'release' }}
+    runs-on: ubuntu-latest
+    steps:
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: cri-dockerd
+        retention-days: 5
+        path: |
+          packaging/deb/**/**/**/*.deb
+          packaging/rpm/**/**/**/*.rpm
+          packaging/static/**/**/**/*.tgz
+          packaging/static/**/**/**/*.zip
