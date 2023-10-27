@@ -15,4 +15,7 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/')
         with:
           files: |
-            cri-dockerd
+            cri-dockerd/**/*.tgz
+            cri-dockerd/**/*.rpm
+            cri-dockerd/**/*.deb
+            cri-dockerd/**/*.zip
