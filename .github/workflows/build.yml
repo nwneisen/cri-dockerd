@@ -9,8 +9,21 @@ on:
     types: [prereleased]
 
 jobs:
+  build-linux:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: '1.20'
+
+    - name: Build
+      run: make static-linux
 
   build-deb:
+    if: ${{ github.event_name == 'release' }}
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
@@ -24,6 +37,7 @@ jobs:
       run: make deb
 
   build-rpm:
+    if: ${{ github.event_name == 'release' }}
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
@@ -35,6 +49,20 @@ jobs:
 
     - name: Build
       run: make rpm
+
+  build-arm:
+    if: ${{ github.event_name == 'release' }}
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: '1.20'
+
+    - name: Build
+      run: make cross-arm
 
   build-windows:
     runs-on: ubuntu-latest
@@ -62,22 +90,10 @@ jobs:
     - name: Build
       run: make cross-mac
 
-  build-arm:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v3
-
-    - name: Set up Go
-      uses: actions/setup-go@v4
-      with:
-        go-version: '1.20'
-
-    - name: Build
-      run: make cross-arm
-
   upload:
     if: ${{ github.event_name == 'release' }}
     runs-on: ubuntu-latest
+    needs: [build-deb, build-rpm, build-windows, build-mac, build-arm]
     steps:
     - name: Upload artifacts
       uses: actions/upload-artifact@v3
