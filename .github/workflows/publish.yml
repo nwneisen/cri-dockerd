@@ -10,9 +10,8 @@ jobs:
       - uses: actions/download-artifact@v3
         with:
           name: cri-dockerd
-          path: cri-dockerd
       - name: files
-        run: ls -l cri-dockerd
+        run: ls -R
 
       - name: Push binaries
         uses: softprops/action-gh-release@v1
