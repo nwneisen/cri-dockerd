@@ -27,8 +27,7 @@ import (
 	"k8s.io/client-go/tools/remotecommand"
 
 	dockertypes "github.com/docker/docker/api/types"
-
-	"k8s.io/kubernetes/pkg/kubelet/cri/streaming"
+	"k8s.io/kubelet/pkg/cri/streaming"
 
 	"github.com/Mirantis/cri-dockerd/libdocker"
 )
@@ -56,6 +55,7 @@ type ExecHandler interface {
 var _ streaming.Runtime = &StreamingRuntime{}
 
 func (r *StreamingRuntime) Exec(
+	ctx context.Context,
 	containerID string,
 	cmd []string,
 	in io.Reader,
@@ -97,6 +97,7 @@ func (r *StreamingRuntime) ExecWithContext(
 }
 
 func (r *StreamingRuntime) Attach(
+	ctx context.Context,
 	containerID string,
 	in io.Reader,
 	out, errw io.WriteCloser,
@@ -112,6 +113,7 @@ func (r *StreamingRuntime) Attach(
 }
 
 func (r *StreamingRuntime) PortForward(
+	ctx context.Context,
 	podSandboxID string,
 	port int32,
 	stream io.ReadWriteCloser,

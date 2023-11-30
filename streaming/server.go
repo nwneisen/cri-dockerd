@@ -17,6 +17,7 @@ limitations under the License.
 package streaming
 
 import (
+	"context"
 	"crypto/tls"
 	"errors"
 	"io"
@@ -32,11 +33,12 @@ import (
 	restful "github.com/emicklei/go-restful"
 
 	"k8s.io/apimachinery/pkg/types"
-	remotecommandconsts "k8s.io/apimachinery/pkg/util/remotecommand"
 	"k8s.io/client-go/tools/remotecommand"
 	runtimeapi "k8s.io/cri-api/pkg/apis/runtime/v1"
-	"k8s.io/kubernetes/pkg/kubelet/cri/streaming/portforward"
-	remotecommandserver "k8s.io/kubernetes/pkg/kubelet/cri/streaming/remotecommand"
+
+	remotecommandconsts "k8s.io/apimachinery/pkg/util/remotecommand"
+	"k8s.io/kubelet/pkg/cri/streaming/portforward"
+	remotecommandserver "k8s.io/kubelet/pkg/cri/streaming/remotecommand"
 )
 
 // Server is the library interface to serve the stream requests.
@@ -369,14 +371,14 @@ var _ remotecommandserver.Executor = &criAdapter{}
 var _ remotecommandserver.Attacher = &criAdapter{}
 var _ portforward.PortForwarder = &criAdapter{}
 
-func (a *criAdapter) ExecInContainer(podName string, podUID types.UID, container string, cmd []string, in io.Reader, out, err io.WriteCloser, tty bool, resize <-chan remotecommand.TerminalSize, timeout time.Duration) error {
+func (a *criAdapter) ExecInContainer(ctx context.Context, podName string, podUID types.UID, container string, cmd []string, in io.Reader, out, err io.WriteCloser, tty bool, resize <-chan remotecommand.TerminalSize, timeout time.Duration) error {
 	return a.Runtime.Exec(container, cmd, in, out, err, tty, resize)
 }
 
-func (a *criAdapter) AttachContainer(podName string, podUID types.UID, container string, in io.Reader, out, err io.WriteCloser, tty bool, resize <-chan remotecommand.TerminalSize) error {
+func (a *criAdapter) AttachContainer(ctx context.Context, podName string, podUID types.UID, container string, in io.Reader, out, err io.WriteCloser, tty bool, resize <-chan remotecommand.TerminalSize) error {
 	return a.Runtime.Attach(container, in, out, err, tty, resize)
 }
 
-func (a *criAdapter) PortForward(podName string, podUID types.UID, port int32, stream io.ReadWriteCloser) error {
+func (a *criAdapter) PortForward(ctx context.Context, podName string, podUID types.UID, port int32, stream io.ReadWriteCloser) error {
 	return a.Runtime.PortForward(podName, port, stream)
 }

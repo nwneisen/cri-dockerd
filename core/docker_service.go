@@ -45,7 +45,6 @@ import (
 
 	v1 "k8s.io/api/core/v1"
 	runtimeapi "k8s.io/cri-api/pkg/apis/runtime/v1"
-	runtimeapi_alpha "k8s.io/cri-api/pkg/apis/runtime/v1alpha2"
 )
 
 const (

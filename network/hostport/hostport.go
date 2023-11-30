@@ -25,7 +25,6 @@ import (
 	"github.com/Mirantis/cri-dockerd/config"
 
 	"github.com/sirupsen/logrus"
-
 	utiliptables "k8s.io/kubernetes/pkg/util/iptables"
 )
 

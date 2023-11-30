@@ -28,7 +28,6 @@ import (
 
 // Provider is the interface provided by proxier implementations.
 type Provider interface {
-	config.EndpointsHandler
 	config.EndpointSliceHandler
 	config.ServiceHandler
 	config.NodeHandler
@@ -64,34 +63,43 @@ func fmtPortName(in string) string {
 type ServicePort interface {
 	// String returns service string.  An example format can be: `IP:Port/Protocol`.
 	String() string
-	// GetClusterIP returns service cluster IP in net.IP format.
+	// ClusterIP returns service cluster IP in net.IP format.
 	ClusterIP() net.IP
-	// GetPort returns service port if present. If return 0 means not present.
+	// Port returns service port if present. If return 0 means not present.
 	Port() int
-	// GetSessionAffinityType returns service session affinity type
+	// SessionAffinityType returns service session affinity type
 	SessionAffinityType() v1.ServiceAffinity
-	// GetStickyMaxAgeSeconds returns service max connection age
+	// StickyMaxAgeSeconds returns service max connection age
 	StickyMaxAgeSeconds() int
 	// ExternalIPStrings returns service ExternalIPs as a string array.
 	ExternalIPStrings() []string
-	// LoadBalancerIPStrings returns service LoadBalancerIPs as a string array.
-	LoadBalancerIPStrings() []string
-	// GetProtocol returns service protocol.
+	// LoadBalancerVIPStrings returns service LoadBalancerIPs which are VIP mode as a string array.
+	LoadBalancerVIPStrings() []string
+	// Protocol returns service protocol.
 	Protocol() v1.Protocol
 	// LoadBalancerSourceRanges returns service LoadBalancerSourceRanges if present empty array if not
 	LoadBalancerSourceRanges() []string
-	// GetHealthCheckNodePort returns service health check node port if present.  If return 0, it means not present.
+	// HealthCheckNodePort returns service health check node port if present.  If return 0, it means not present.
 	HealthCheckNodePort() int
-	// GetNodePort returns a service Node port if present. If return 0, it means not present.
+	// NodePort returns a service Node port if present. If return 0, it means not present.
 	NodePort() int
-	// NodeLocalExternal returns if a service has only node local endpoints for external traffic.
-	NodeLocalExternal() bool
-	// NodeLocalInternal returns if a service has only node local endpoints for internal traffic.
-	NodeLocalInternal() bool
+	// ExternalPolicyLocal returns if a service has only node local endpoints for external traffic.
+	ExternalPolicyLocal() bool
+	// InternalPolicyLocal returns if a service has only node local endpoints for internal traffic.
+	InternalPolicyLocal() bool
 	// InternalTrafficPolicy returns service InternalTrafficPolicy
-	InternalTrafficPolicy() *v1.ServiceInternalTrafficPolicyType
-	// HintsAnnotation returns the value of the v1.AnnotationTopologyAwareHints annotation.
+	InternalTrafficPolicy() *v1.ServiceInternalTrafficPolicy
+	// HintsAnnotation returns the value of the v1.DeprecatedAnnotationTopologyAwareHints annotation.
 	HintsAnnotation() string
+	// ExternallyAccessible returns true if the service port is reachable via something
+	// other than ClusterIP (NodePort/ExternalIP/LoadBalancer)
+	ExternallyAccessible() bool
+	// UsesClusterEndpoints returns true if the service port ever sends traffic to
+	// endpoints based on "Cluster" traffic policy
+	UsesClusterEndpoints() bool
+	// UsesLocalEndpoints returns true if the service port ever sends traffic to
+	// endpoints based on "Local" traffic policy
+	UsesLocalEndpoints() bool
 }
 
 // Endpoint in an interface which abstracts information about an endpoint.
@@ -100,35 +108,26 @@ type Endpoint interface {
 	// String returns endpoint string.  An example format can be: `IP:Port`.
 	// We take the returned value as ServiceEndpoint.Endpoint.
 	String() string
-	// GetIsLocal returns true if the endpoint is running in same host as kube-proxy, otherwise returns false.
-	GetIsLocal() bool
-	// IsReady returns true if an endpoint is ready and not terminating.
-	// This is only set when watching EndpointSlices. If using Endpoints, this is always
-	// true since only ready endpoints are read from Endpoints.
-	IsReady() bool
-	// IsServing returns true if an endpoint is ready. It does not account
-	// for terminating state.
-	// This is only set when watching EndpointSlices. If using Endpoints, this is always
-	// true since only ready endpoints are read from Endpoints.
-	IsServing() bool
-	// IsTerminating retruns true if an endpoint is terminating. For pods,
-	// that is any pod with a deletion timestamp.
-	// This is only set when watching EndpointSlices. If using Endpoints, this is always
-	// false since terminating endpoints are always excluded from Endpoints.
-	IsTerminating() bool
-	// GetZoneHint returns the zone hint for the endpoint. This is based on
-	// endpoint.hints.forZones[0].name in the EndpointSlice API.
-	GetZoneHints() sets.String
 	// IP returns IP part of the endpoint.
 	IP() string
 	// Port returns the Port part of the endpoint.
-	Port() (int, error)
-	// Equal checks if two endpoints are equal.
-	Equal(Endpoint) bool
-	// GetNodeName returns the node name for the endpoint
-	GetNodeName() string
-	// GetZone returns the zone for the endpoint
-	GetZone() string
+	Port() int
+
+	// IsLocal returns true if the endpoint is running on the same host as kube-proxy.
+	IsLocal() bool
+	// IsReady returns true if an endpoint is ready and not terminating, or
+	// if PublishNotReadyAddresses is set on the service.
+	IsReady() bool
+	// IsServing returns true if an endpoint is ready. It does not account
+	// for terminating state.
+	IsServing() bool
+	// IsTerminating returns true if an endpoint is terminating. For pods,
+	// that is any pod with a deletion timestamp.
+	IsTerminating() bool
+
+	// ZoneHints returns the zone hint for the endpoint. This is based on
+	// endpoint.hints.forZones[0].name in the EndpointSlice API.
+	ZoneHints() sets.Set[string]
 }
 
 // ServiceEndpoint is used to identify a service and one of its endpoint pair.

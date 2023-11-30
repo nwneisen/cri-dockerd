@@ -18,10 +18,10 @@ package core
 
 import (
 	"context"
+
 	"github.com/Mirantis/cri-dockerd/config"
 	"github.com/Mirantis/cri-dockerd/utils"
 	v1 "k8s.io/cri-api/pkg/apis/runtime/v1"
-	runtimeapi_alpha "k8s.io/cri-api/pkg/apis/runtime/v1alpha2"
 )
 
 func (as *dockerServiceAlpha) RunPodSandbox(ctx context.Context, r *runtimeapi_alpha.RunPodSandboxRequest) (res *runtimeapi_alpha.RunPodSandboxResponse, err error) {
