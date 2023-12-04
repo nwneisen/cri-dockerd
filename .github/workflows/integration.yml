@@ -13,10 +13,15 @@ jobs:
     timeout-minutes: 60
     steps:
 
-      - name: Set up Go 1.21.3
-        uses: actions/setup-go@v1
+      - name: Load environment
+        uses: c-py/action-dotenv-to-setenv@v4
         with:
-          go-version: 1.21.3
+          env-file: .github/.env
+
+      - name: Set up Go ${{ env.GO_VERSION }}
+        uses: actions/setup-go@v4
+        with:
+          go-version: ${{ env.GO_VERSION }}
         id: go
 
       - name: Setup environment
