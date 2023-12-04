@@ -17,7 +17,7 @@ jobs:
       - name: Load environment
         uses: c-py/action-dotenv-to-setenv@v4
         with:
-          env-file: .github/.env
+          env-file: src/github.com/Mirantis/cri-dockerd/.github/.env
 
       - name: Set up Go ${{ env.GO_VERSION }}
         uses: actions/setup-go@v4
@@ -84,12 +84,6 @@ jobs:
         run: |
           make critest crictl
           find $(pwd)/build/bin -type f -exec mv {} /usr/local/bin \;
-
-      - name: Checkout cri-dockerd
-        uses: actions/checkout@v2
-        with:
-          repository: ${{ github.repository }}
-          path: src/github.com/Mirantis/cri-dockerd
 
       - name: Build cri-dockerd
         working-directory: src/github.com/Mirantis/cri-dockerd
