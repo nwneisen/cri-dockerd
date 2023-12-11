@@ -22,4 +22,4 @@ jobs:
 
       - name: Vet Go Code
         working-directory: .
-        run: make vet
+        run: go vet
