@@ -15,3 +15,11 @@ jobs:
       uses: ./.github/workflows/unit.yml
   build:
     uses: ./.github/workflows/build.yml
+  e2e:
+    if: ${{ always() && contains(join(needs.*.result, ','), 'success') }}
+    needs: [build, vet, unit-test]
+    uses: ./.github/workflows/e2e.yml
+  integration:
+    if: ${{ always() && contains(join(needs.*.result, ','), 'success') }}
+    needs: [build, vet, unit-test]
+    uses: ./.github/workflows/integration.yml
